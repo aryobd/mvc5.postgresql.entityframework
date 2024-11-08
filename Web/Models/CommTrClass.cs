@@ -18,5 +18,7 @@ namespace Web.Models
 
         public string class_desc { get; set; }
         public int? meter_size_code { get; set; }
+
+        public string group_desc { get; set; }
     }
 }

@@ -15,16 +15,23 @@ namespace Web.Controllers
 
             // USING NATIVE SQL - DEFINE THE SQL QUERY
             string sqlQuery = @"
-                select
-                a.group_code,
-                a.group_desc
-                
-                from comm.tr_group a
-                ";
+select
+a.group_code,
+a.class_code,
+a.class_desc,
+a.meter_size_code,
+
+b.group_desc
+
+from comm.tr_class a
+
+join comm.tr_group b
+on a.group_code = b.group_code
+";
 
             // EXECUTE THE QUERY AND MAP TO THE MODEL
-            var qry = dbContext.Database.SqlQuery<CommTrGroup>(sqlQuery).AsQueryable();
-            List<CommTrGroup> lst = qry.ToList();
+            var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery).AsQueryable();
+            List<CommTrClass> lst = qry.ToList();
 
             return View(lst);
         }
