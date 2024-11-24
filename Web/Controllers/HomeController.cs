@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -27,10 +28,28 @@ from comm.tr_class a
 
 join comm.tr_group b
 on a.group_code = b.group_code
+
+where a.group_code = @group_code --> MENGGUNAKAN PARAMETER
+and a.class_code = @class_code --> MENGGUNAKAN PARAMETER
 ";
 
+            // DEFINE THE PARAMETERS
+            NpgsqlParameter param1 = new NpgsqlParameter("@group_code", NpgsqlTypes.NpgsqlDbType.Smallint)
+            {
+                Value = (Int16)1 // ASSIGN A VALUE TO THE @group_code PARAMETER
+            };
+
+            NpgsqlParameter param2 = new NpgsqlParameter("@class_code", NpgsqlTypes.NpgsqlDbType.Varchar)
+            {
+                Value = "1A" // ASSIGN A VALUE TO THE @class_code PARAMETER
+            };
+
+            // EXECUTE THE QUERY WITH PARAMETERS AND MAP TO THE MODEL
+            var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery, param1, param2).AsQueryable(); // WITH PARAMETERS
+
             // EXECUTE THE QUERY AND MAP TO THE MODEL
-            var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery).AsQueryable();
+            //var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery).AsQueryable(); // WITHOUT PARAMETERS
+
             List<CommTrClass> lst = qry.ToList();
 
             return View(lst);
