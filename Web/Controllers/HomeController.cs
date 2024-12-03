@@ -30,7 +30,7 @@ join comm.tr_group b
 on a.group_code = b.group_code
 
 where a.group_code = @group_code --> MENGGUNAKAN PARAMETER
-and a.class_code = @class_code --> MENGGUNAKAN PARAMETER
+--and a.class_code = @class_code --> MENGGUNAKAN PARAMETER
 
 order by a.group_code, a.class_code --> ORDER
 
@@ -44,10 +44,10 @@ offset @offset limit @limit --> PAGING --> MULAI DARI BARIS @offset + 1 SEBANYAK
                 Value = (Int16)1 // ASSIGN A VALUE TO THE @group_code PARAMETER
             };
 
-            NpgsqlParameter param2 = new NpgsqlParameter("@class_code", NpgsqlTypes.NpgsqlDbType.Varchar)
-            {
-                Value = "1A" // ASSIGN A VALUE TO THE @class_code PARAMETER
-            };
+            //NpgsqlParameter param2 = new NpgsqlParameter("@class_code", NpgsqlTypes.NpgsqlDbType.Varchar)
+            //{
+            //    Value = "1A" // ASSIGN A VALUE TO THE @class_code PARAMETER
+            //};
 
             NpgsqlParameter param3 = new NpgsqlParameter("@offset", NpgsqlTypes.NpgsqlDbType.Integer)
             {
@@ -60,12 +60,20 @@ offset @offset limit @limit --> PAGING --> MULAI DARI BARIS @offset + 1 SEBANYAK
             };
 
             // EXECUTE THE QUERY WITH PARAMETERS AND MAP TO THE MODEL
-            var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery, param1, param2, param3, param4).AsQueryable(); // WITH PARAMETERS
+            var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery, param1, /*param2,*/ param3, param4).AsQueryable(); // WITH PARAMETERS
 
             // EXECUTE THE QUERY AND MAP TO THE MODEL
             //var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery).AsQueryable(); // WITHOUT PARAMETERS
 
             List<CommTrClass> lst = qry.ToList();
+
+            // ORDER BY WITH LINQ - QUERY SYNTAX
+            var lst2 = from p in lst
+                       orderby p.class_code descending
+                       select p;
+
+            // ORDER BY WITH LINQ - METHOD SYNTAX
+            var lst3 = lst.OrderByDescending(p => p.class_code);
 
             return View(lst);
         }
