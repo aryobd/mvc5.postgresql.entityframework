@@ -12,6 +12,13 @@ namespace Web.Controllers
     {
         public ActionResult Index()
         {
+            SelectData();
+
+            return View();
+        }
+
+        private void SelectData()
+        {
             PdamEntities dbContext = new PdamEntities();
 
             // USING NATIVE SQL - DEFINE THE SQL QUERY
@@ -44,10 +51,10 @@ offset @offset limit @limit --> PAGING --> MULAI DARI BARIS @offset + 1 SEBANYAK
                 Value = (Int16)1 // ASSIGN A VALUE TO THE @group_code PARAMETER
             };
 
-            //NpgsqlParameter param2 = new NpgsqlParameter("@class_code", NpgsqlTypes.NpgsqlDbType.Varchar)
-            //{
-            //    Value = "1A" // ASSIGN A VALUE TO THE @class_code PARAMETER
-            //};
+            NpgsqlParameter param2 = new NpgsqlParameter("@class_code", NpgsqlTypes.NpgsqlDbType.Varchar)
+            {
+                Value = "1A" // ASSIGN A VALUE TO THE @class_code PARAMETER
+            };
 
             NpgsqlParameter param3 = new NpgsqlParameter("@offset", NpgsqlTypes.NpgsqlDbType.Integer)
             {
@@ -60,7 +67,7 @@ offset @offset limit @limit --> PAGING --> MULAI DARI BARIS @offset + 1 SEBANYAK
             };
 
             // EXECUTE THE QUERY WITH PARAMETERS AND MAP TO THE MODEL
-            var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery, param1, /*param2,*/ param3, param4).AsQueryable(); // WITH PARAMETERS
+            var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery, param1, param2, param3, param4).AsQueryable(); // WITH PARAMETERS
 
             // EXECUTE THE QUERY AND MAP TO THE MODEL
             //var qry = dbContext.Database.SqlQuery<CommTrClass>(sqlQuery).AsQueryable(); // WITHOUT PARAMETERS
@@ -68,14 +75,16 @@ offset @offset limit @limit --> PAGING --> MULAI DARI BARIS @offset + 1 SEBANYAK
             List<CommTrClass> lst = qry.ToList();
 
             // ORDER BY WITH LINQ - QUERY SYNTAX
-            var lst2 = from p in lst
-                       orderby p.class_code descending
-                       select p;
+            List<CommTrClass> lst2 = (
+                from p in lst
+                orderby p.class_code descending
+                select p
+            ).ToList();
 
             // ORDER BY WITH LINQ - METHOD SYNTAX
-            var lst3 = lst.OrderByDescending(p => p.class_code);
-
-            return View(lst);
+            List<CommTrClass> lst3 = (
+                lst.OrderByDescending(p => p.class_code)
+            ).ToList();
         }
 
         public ActionResult About()
